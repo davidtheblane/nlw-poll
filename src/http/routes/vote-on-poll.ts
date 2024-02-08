@@ -1,9 +1,9 @@
 import { z } from "zod";
 const { serialize, parse } = require('@fastify/cookie')
 import { prisma } from "../../lib/prisma";
+import { redis } from "../../lib/redis";
 import { FastifyInstance } from "fastify";
 import { randomUUID } from "crypto";
-
 
 export async function voteOnPoll(app: FastifyInstance) {
 
@@ -40,6 +40,8 @@ export async function voteOnPoll(app: FastifyInstance) {
           }
         })
 
+        await redis.zincrby(pollId, -1, userPreviousVoteOnPoll.pollOptionId);
+
       } else if (userPreviousVoteOnPoll) {
         return reply.status(400).send({ message: "You already voted in this poll!" })
       }
@@ -64,6 +66,8 @@ export async function voteOnPoll(app: FastifyInstance) {
       }
     })
 
-    return reply.status(201).send()
+    await redis.zincrby(pollId, 1, pollOptionId);
+
+    return reply.status(201).send({ message: "Vote Accepted!" })
   })
 }
