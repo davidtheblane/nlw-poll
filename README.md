@@ -77,8 +77,8 @@ services:
 
   redis:
     image: bitnami/redis:latest
-		environment: 
-			- 'ALLOW_EMPTY_PASSWORD=yes'
+    environment:
+      - 'ALLOW_EMPTY_PASSWORD=yes'
     ports:
       - '6379:6379'
     volumes:
